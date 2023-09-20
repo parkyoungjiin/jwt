@@ -1,30 +1,35 @@
 package com.cos.jwt.config;
 
+import javax.servlet.FilterChain;
+
 import org.apache.catalina.filters.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import lombok.AllArgsConstructor;
+import com.cos.jwt.filter.MyFilter1;
+import com.cos.jwt.jwt.jwtAuthenticationFilter;
+
 
 @Configuration
 @EnableWebSecurity // 시큐리티 활성화 및 웹 보안 설정 구성에 사용된다.
 public class SecurityConfig{
-	
+    private final CorsFilter corsFilter = new CorsFilter();
+
 	@Autowired
 	private CorsConfig corsConfig;
 
-	
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
+	            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
 				.csrf().disable()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션을 사용하지 않는다는 설정.
 				.and()
@@ -48,7 +53,9 @@ public class SecurityConfig{
 		public void configure(HttpSecurity http) throws Exception {
 			AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
 			http
-					.addFilter(corsConfig.corsFilter());
+					.addFilter(corsConfig.corsFilter()) //corsFilter 설정
+					.addFilter(new jwtAuthenticationFilter(authenticationManager));
+
 		}
 	}
 	

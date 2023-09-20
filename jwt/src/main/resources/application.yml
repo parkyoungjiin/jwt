@@ -13,6 +13,7 @@ spring:
     url: jdbc:mysql://localhost:3306/jwt?serverTimezone=Asia/Seoul
     username: cos
     password: cos1234
+
       
   jpa:
     open-in-view: true
@@ -21,5 +22,3 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
-    properties:
-      "[hibernate.format_sql]": true
