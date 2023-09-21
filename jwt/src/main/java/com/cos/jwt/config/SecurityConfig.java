@@ -11,11 +11,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.cos.jwt.filter.MyFilter1;
-import com.cos.jwt.jwt.jwtAuthenticationFilter;
+import com.cos.jwt.config.jwt.jwtAuthenticationFilter;
 
 
 @Configuration
@@ -23,9 +24,14 @@ import com.cos.jwt.jwt.jwtAuthenticationFilter;
 public class SecurityConfig{
     private final CorsFilter corsFilter = new CorsFilter();
 
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
 	@Autowired
 	private CorsConfig corsConfig;
-
+	
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
@@ -37,7 +43,7 @@ public class SecurityConfig{
 				.httpBasic().disable() // 
 				.apply(new MyCustomDsl()) // 커스텀 필터 등록
 				.and()
-				.authorizeRequests(authroize -> authroize.antMatchers("/api/v1/user/**") // user에 대한 경로의 접근 권한 설정
+				.authorizeRequests(authroize -> authroize.antMatchers("/api/v1/user/** or /h2-console/**") // user에 대한 경로의 접근 권한 설정
 						.access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
 						.antMatchers("/api/v1/manager/**") // manager에 대한 경로의 접근 권한 설정
 						.access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
