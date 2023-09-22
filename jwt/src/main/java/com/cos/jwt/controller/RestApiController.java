@@ -1,6 +1,7 @@
 package com.cos.jwt.controller;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cos.jwt.config.auth.PrincipalDetails;
 import com.cos.jwt.model.User;
 import com.cos.jwt.repository.UserRepository;
 
@@ -17,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RestApiController {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-	
 	private final UserRepository userRepository;
 	
 	@GetMapping("/home")
@@ -41,6 +42,26 @@ public class RestApiController {
 		System.out.println("Join 메서드 종료");
 	
 		return "<h1>회원가입 완료</h1>";
+	}
+	
+	@GetMapping("/api/v1/user")
+	public String user(Authentication authentication) {
+		PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+		System.out.println("principal : "+principal.getUser().getId());
+		System.out.println("principal : "+principal.getUser().getUsername());
+		System.out.println("principal : "+principal.getUser().getPassword());
+
+		return "user";
+	}
+	
+	@GetMapping("/api/v1/manager")
+	public String manager() {
+		return "manager";
+	}
+	
+	@GetMapping("/api/v1/admin")
+	public String admin() {
+		return "admin";
 	}
 	
 }
